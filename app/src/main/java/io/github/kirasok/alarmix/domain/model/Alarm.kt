@@ -1,13 +1,17 @@
 package io.github.kirasok.alarmix.domain.model
 
+import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity
 data class Alarm(
-  val timestamp: Int,
+  @PrimaryKey val id: UUID,
+  val timestamp: Long,
   val enabled: Boolean,
   val label: String = "",
-  val days: Days = Days(),
+  @Embedded val days: Days = Days(),
 )
 
 @Entity
@@ -20,3 +24,5 @@ data class Days(
   val saturday: Boolean = false,
   val sunday: Boolean = false,
 )
+
+class InvalidAlarmException(message: String) : Exception(message)

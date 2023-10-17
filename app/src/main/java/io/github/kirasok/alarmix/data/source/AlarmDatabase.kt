@@ -6,7 +6,8 @@ import io.github.kirasok.alarmix.domain.model.Alarm
 
 @Database(
   entities = [Alarm::class],
-  version = 1
+  version = 1,
+  exportSchema = false
 )
 abstract class AlarmDatabase : RoomDatabase() {
   abstract val alarmDao: AlarmDao
