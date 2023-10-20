@@ -24,7 +24,9 @@ class InsertAlarm(private val repository: AlarmRepository) {
       throw InvalidAlarmException("timestamp can't be less than current time")
     if (!alarm.enabled)
       TODO("Check alarmManager if alarm is set and unset it")
-//      alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(alarm.timestamp))
-    TODO()
+    if (alarmManager.canScheduleExactAlarms())
+      alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(alarm.timestamp))
+    else
+      TODO("ask permission from user to set alarms")
   }
 }
