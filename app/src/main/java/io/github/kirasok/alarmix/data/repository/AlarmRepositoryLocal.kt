@@ -2,6 +2,7 @@ package io.github.kirasok.alarmix.data.repository
 
 import io.github.kirasok.alarmix.data.source.AlarmDao
 import io.github.kirasok.alarmix.domain.model.Alarm
+import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import kotlinx.coroutines.flow.Flow
 
 class AlarmRepositoryLocal(private val dao: AlarmDao) : AlarmRepository {

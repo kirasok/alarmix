@@ -7,7 +7,7 @@ import java.util.UUID
 
 @Entity
 data class Alarm(
-  @PrimaryKey val id: UUID,
+  @PrimaryKey(autoGenerate = true) val id: Int = 0,
   val timestamp: Long,
   val enabled: Boolean,
   val label: String = "",

@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.github.kirasok.alarmix.data.repository.AlarmRepository
+import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.data.repository.AlarmRepositoryLocal
 import io.github.kirasok.alarmix.data.source.AlarmDatabase
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases

@@ -1,4 +1,4 @@
-package io.github.kirasok.alarmix.data.repository
+package io.github.kirasok.alarmix.domain.repository
 
 import io.github.kirasok.alarmix.domain.model.Alarm
 import kotlinx.coroutines.flow.Flow
