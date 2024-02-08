@@ -6,11 +6,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.data.repository.AlarmRepositoryLocal
 import io.github.kirasok.alarmix.data.source.AlarmDatabase
+import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
+import io.github.kirasok.alarmix.domain.use_case.DeleteAlarm
+import io.github.kirasok.alarmix.domain.use_case.GetAlarmById
 import io.github.kirasok.alarmix.domain.use_case.GetAlarms
+import io.github.kirasok.alarmix.domain.use_case.InsertAlarm
 import javax.inject.Singleton
 
 @Module
@@ -26,11 +29,15 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun providesNoteRepository(db: AlarmDatabase): AlarmRepository = AlarmRepositoryLocal(db.alarmDao)
+  fun providesNoteRepository(db: AlarmDatabase): AlarmRepository =
+    AlarmRepositoryLocal(db.alarmDao)
 
   @Provides
   @Singleton
   fun providesAlarmUseCases(repository: AlarmRepository): AlarmUseCases = AlarmUseCases(
     GetAlarms(repository),
+    GetAlarmById(repository),
+    InsertAlarm(repository),
+    DeleteAlarm(repository)
   )
 }
