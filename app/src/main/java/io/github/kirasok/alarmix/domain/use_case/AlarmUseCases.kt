@@ -38,17 +38,16 @@ class InsertAlarm(private val repository: AlarmRepository) {
       PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
     alarmManager.cancel(pendingIntent) // Will cancel pending intent with same request code
-    if (alarm.timestamp < System.currentTimeMillis())
+    if (alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis()) // accepts in milliseconds
       throw InvalidAlarmException("timestamp can't be less than current time")
     if (alarmManager.canScheduleExactAlarms()) {
-      if (alarm.enabled) {
-        val alarmClockInfo = AlarmManager.AlarmClockInfo(alarm.timestamp, pendingIntent)
-        // Inserts or updates alarm with same pending intent request code
-        alarmManager.setAlarmClock(
-          alarmClockInfo,
-          pendingIntent
-        )
-      }
+      val alarmClockInfo =
+        AlarmManager.AlarmClockInfo(alarm.timestamp.toEpochSecond() * 1000, pendingIntent) // accepts in milliseconds
+      // Inserts or updates alarm with same pending intent request code
+      alarmManager.setAlarmClock(
+        alarmClockInfo,
+        pendingIntent
+      )
     } else {
       TODO("ask permission from user to set alarms")
     }
