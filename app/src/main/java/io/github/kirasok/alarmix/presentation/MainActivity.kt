@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
           val navController = rememberNavController()
           NavHost(
             navController = navController,
-            startDestination = Screen.AlarmsScreen.route
+            startDestination = Screen.EditorScreen.route
           ) {
             composable(route = Screen.AlarmsScreen.route) {
               AlarmsScreen(navController = navController)
