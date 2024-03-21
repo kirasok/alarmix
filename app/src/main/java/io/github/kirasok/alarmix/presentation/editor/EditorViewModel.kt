@@ -1,6 +1,5 @@
 package io.github.kirasok.alarmix.presentation.editor
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -17,8 +16,7 @@ class EditorViewModel @Inject constructor(
   private val useCases: AlarmUseCases,
   savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-  private val _time = mutableStateOf(ZonedDateTime.now())
-  val time: State<ZonedDateTime> = _time
+  private val time = mutableStateOf<ZonedDateTime?>(null)
 
   private var currentAlarmId: Int? = null
 
@@ -28,7 +26,7 @@ class EditorViewModel @Inject constructor(
         viewModelScope.launch {
           useCases.getAlarmById(alarmId)?.also { alarm ->
             currentAlarmId = alarm.id
-            _time.value = alarm.timestamp
+            time.value = alarm.timestamp
           }
         }
     }
@@ -36,7 +34,17 @@ class EditorViewModel @Inject constructor(
 
   fun onEvent(event: EditorEvent) {
     when (event) {
-      is EditorEvent.SetAlarm -> TODO()
+      is EditorEvent.SetAlarm -> viewModelScope.launch {
+        useCases.insertAlarm(
+          Alarm(
+            timestamp = time.value.run {
+              // If we'll initialize time during construction of view model then we can get an InvalidAlarmException because the time could be past current time even with added hours and minutes
+              // But checking it for being null there we can use this class to both create new alarm and edit old ones
+              this ?: ZonedDateTime.now()
+            }.plusHours(event.hour).plusMinutes(event.minute)
+          )
+        )
+      }
     }
   }
 }

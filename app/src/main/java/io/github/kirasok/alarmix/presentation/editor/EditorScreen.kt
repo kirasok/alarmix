@@ -34,7 +34,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
         state = state
       )
       ElevatedButton(onClick = {
-        viewModel.onEvent(EditorEvent.SetAlarm(state.hour, state.minute))
+        viewModel.onEvent(EditorEvent.SetAlarm(state.hour.toLong(), state.minute.toLong()))
       }) {
         Text(text = "SET ALARM")
       }
