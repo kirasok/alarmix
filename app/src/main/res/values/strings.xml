@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Alarmix</string>
+  <string name="editor_hint">Select how much time should pass before alarm is fired</string>
+  <string name="set_alarm">SET ALARM</string>
 </resources>

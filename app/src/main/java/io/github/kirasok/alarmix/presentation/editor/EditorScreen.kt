@@ -16,10 +16,12 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import io.github.kirasok.alarmix.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +39,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
       val state = rememberTimePickerState(initialHour, initialMinute)
 
       Text(
-        text = "Select how much time should pass before alarm is fired",
+        text = stringResource(R.string.editor_hint),
         modifier = Modifier.padding(24.dp),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.bodyMedium
@@ -49,7 +51,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
       ElevatedButton(onClick = {
         viewModel.onEvent(EditorEvent.SetAlarm(state.hour.toLong(), state.minute.toLong()))
       }) {
-        Text(text = "SET ALARM")
+        Text(text = stringResource(R.string.set_alarm))
       }
     }
   }
