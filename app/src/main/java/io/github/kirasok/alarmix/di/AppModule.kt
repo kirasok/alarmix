@@ -7,13 +7,16 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.github.kirasok.alarmix.data.repository.AlarmRepositoryLocal
+import io.github.kirasok.alarmix.data.repository.AlarmSchedulerImpl
 import io.github.kirasok.alarmix.data.source.AlarmDatabase
 import io.github.kirasok.alarmix.domain.repository.AlarmRepository
+import io.github.kirasok.alarmix.domain.repository.AlarmScheduler
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import io.github.kirasok.alarmix.domain.use_case.DeleteAlarm
 import io.github.kirasok.alarmix.domain.use_case.GetAlarmById
 import io.github.kirasok.alarmix.domain.use_case.GetAlarms
 import io.github.kirasok.alarmix.domain.use_case.InsertAlarm
+import io.github.kirasok.alarmix.domain.use_case.ValidateAlarm
 import javax.inject.Singleton
 
 @Module
@@ -34,10 +37,23 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun providesAlarmUseCases(repository: AlarmRepository): AlarmUseCases = AlarmUseCases(
-    GetAlarms(repository),
-    GetAlarmById(repository),
-    InsertAlarm(repository),
-    DeleteAlarm(repository)
-  )
+  fun providesScheduler(app: Application): AlarmScheduler =
+    AlarmSchedulerImpl(app.applicationContext)
+
+  @Provides
+  fun provideValidateAlarmCase(scheduler: AlarmScheduler) = ValidateAlarm(scheduler)
+
+  @Provides
+  @Singleton
+  fun providesAlarmUseCases(
+    repository: AlarmRepository,
+    scheduler: AlarmScheduler,
+    validator: ValidateAlarm,
+  ): AlarmUseCases =
+    AlarmUseCases(
+      GetAlarms(repository),
+      GetAlarmById(repository),
+      InsertAlarm(repository, validator, scheduler),
+      DeleteAlarm(repository),
+    )
 }
