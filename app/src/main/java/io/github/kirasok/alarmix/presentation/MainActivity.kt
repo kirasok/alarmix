@@ -18,8 +18,6 @@ import io.github.kirasok.alarmix.presentation.editor.EditorScreen
 import io.github.kirasok.alarmix.presentation.util.Screen
 import io.github.kirasok.alarmix.ui.theme.AlarmixTheme
 
-private const val PRIMARY_CHANNEL_ID = "primary_notification_channel"
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
