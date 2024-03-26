@@ -21,12 +21,12 @@ class AlarmSchedulerImpl(private val context: Context) : AlarmScheduler {
     val alarmClockInfo =
       AlarmManager.AlarmClockInfo(
         alarm.timestamp.toEpochSecond() * 1000,
-        pendingIntent
+        pendingIntent // TODO: change intent to activity where user can cancel alarm
       ) // accepts in milliseconds
     // Inserts or updates alarm with same pending intent request code
     alarmManager.setAlarmClock(
       alarmClockInfo,
-      pendingIntent
+      pendingIntent // intent which will be triggered when alarm is fired
     )
   }
 
