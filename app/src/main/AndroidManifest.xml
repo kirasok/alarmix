@@ -18,7 +18,7 @@
     android:theme="@style/Theme.Alarmix"
     tools:targetApi="33">
     <receiver
-      android:name=".presentation.AlarmReceiver"
+      android:name=".presentation.receiver.AlarmReceiver"
       android:exported="false" />
     <activity
       android:name=".presentation.MainActivity"

@@ -1,4 +1,4 @@
-package io.github.kirasok.alarmix.presentation
+package io.github.kirasok.alarmix.presentation.receiver
 
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,6 +8,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import io.github.kirasok.alarmix.R
+import io.github.kirasok.alarmix.presentation.MainActivity
 
 
 class AlarmReceiver : BroadcastReceiver() {

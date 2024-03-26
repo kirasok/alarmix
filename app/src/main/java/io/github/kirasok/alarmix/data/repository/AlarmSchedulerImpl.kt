@@ -6,7 +6,7 @@ import android.content.Context
 import android.content.Intent
 import io.github.kirasok.alarmix.domain.model.Alarm
 import io.github.kirasok.alarmix.domain.repository.AlarmScheduler
-import io.github.kirasok.alarmix.presentation.AlarmReceiver
+import io.github.kirasok.alarmix.presentation.receiver.AlarmReceiver
 
 class AlarmSchedulerImpl(private val context: Context) : AlarmScheduler {
 
