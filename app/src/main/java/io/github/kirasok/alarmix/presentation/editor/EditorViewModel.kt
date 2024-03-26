@@ -65,6 +65,5 @@ class EditorViewModel @Inject constructor(
 
   sealed class UiEvent {
     data class ShowSnackbar(val message: String) : UiEvent()
-
   }
 }

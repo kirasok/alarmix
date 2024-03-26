@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">Alarmix</string>
+  <string name="app_name">Alarmix</string>
   <string name="editor_hint">Select how much time should pass before alarm is fired</string>
   <string name="set_alarm">SET ALARM</string>
+  <string name="permissions_rationale">Please grant the following permissions:</string>
+  <string name="permissions_notification">\n- Notification permission to be able to receive alarms</string>
+  <string name="permissions_schedule">\n- Schedule alarms permission to be able to schedule alarms</string>
+  <string name="permissions_demand">Please grant the following permission, without them app won\'t work</string>
 </resources>
