@@ -10,10 +10,14 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,11 +26,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import io.github.kirasok.alarmix.R
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hiltViewModel()) {
-  Scaffold {
+  val snackbarHostState = remember { SnackbarHostState() }
+  LaunchedEffect(key1 = true) {
+    viewModel.eventFlow.collectLatest { event ->
+      when (event) {
+        is EditorViewModel.UiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(message = event.message)
+      }
+    }
+  }
+  Scaffold(
+    snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+  ) {
     Column(
       modifier = Modifier
         .fillMaxSize()
@@ -36,7 +51,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
     ) {
       val initialHour = 7
       val initialMinute = 30
-      val state = rememberTimePickerState(initialHour, initialMinute)
+      val timePickerState = rememberTimePickerState(initialHour, initialMinute)
 
       Text(
         text = stringResource(R.string.editor_hint),
@@ -46,10 +61,15 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
       )
       Spacer(modifier = Modifier.size(24.dp))
       TimePicker(
-        state = state
+        state = timePickerState
       )
       ElevatedButton(onClick = {
-        viewModel.onEvent(EditorEvent.SetAlarm(state.hour.toLong(), state.minute.toLong()))
+        viewModel.onEvent(
+          EditorEvent.SetAlarm(
+            timePickerState.hour.toLong(),
+            timePickerState.minute.toLong()
+          )
+        )
       }) {
         Text(text = stringResource(R.string.set_alarm))
       }
