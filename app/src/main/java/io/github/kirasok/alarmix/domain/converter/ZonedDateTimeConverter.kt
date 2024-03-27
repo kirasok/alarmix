@@ -8,11 +8,9 @@ import java.time.ZonedDateTime
 class ZonedDateTimeConverter {
 
   @TypeConverter
-  fun fromLong(epochSecond: Long): ZonedDateTime =
-    ZonedDateTime.ofInstant(
-      Instant.ofEpochSecond(epochSecond),
-      ZoneId.systemDefault()
-    )
+  fun fromLong(epochSecond: Long): ZonedDateTime = ZonedDateTime.ofInstant(
+    Instant.ofEpochSecond(epochSecond), ZoneId.systemDefault()
+  )
 
   @TypeConverter
   fun toEpochSecond(dateTime: ZonedDateTime): Long = dateTime.toEpochSecond()

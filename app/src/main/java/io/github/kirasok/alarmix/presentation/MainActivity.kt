@@ -62,14 +62,12 @@ class MainActivity : ComponentActivity() {
             }
             composable(
               route = Screen.EditorScreen.route + "?alarmId={alarmId}",
-              arguments = listOf(
-                navArgument(
-                  name = "alarmId",
-                ) {
-                  type = NavType.IntType
-                  defaultValue = -1
-                }
-              ),
+              arguments = listOf(navArgument(
+                name = "alarmId",
+              ) {
+                type = NavType.IntType
+                defaultValue = -1
+              }),
             ) {
               EditorScreen(navController = navController)
             }

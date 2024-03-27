@@ -37,9 +37,7 @@ fun PermissionScreen(
       verticalArrangement = Arrangement.Center
     ) {
       Text(
-        text = if (multiplePermissionsState.shouldShowRationale) rationale else stringResource(
-          R.string.permissions_demand
-        ),
+        text = if (multiplePermissionsState.shouldShowRationale) rationale else stringResource(R.string.permissions_demand),
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(24.dp)
       )

@@ -13,20 +13,18 @@ class AlarmSchedulerImpl(private val context: Context) : AlarmScheduler {
   private val alarmManager = context.getSystemService(AlarmManager::class.java)
   override fun schedule(alarm: Alarm) {
     val pendingIntent = PendingIntent.getBroadcast(
-      context,
-      alarm.id, // request code
-      Intent(context, AlarmReceiver::class.java),
-      PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+      context, alarm.id, // request code
+      Intent(context, AlarmReceiver::class.java).putExtra(
+        AlarmReceiver.INTENT_EXTRA_ALARM_ID, alarm.id
+      ), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
-    val alarmClockInfo =
-      AlarmManager.AlarmClockInfo(
-        alarm.timestamp.toEpochSecond() * 1000,
-        pendingIntent // TODO: change intent to activity where user can cancel alarm
-      ) // accepts in milliseconds
+    val alarmClockInfo = AlarmManager.AlarmClockInfo(
+      alarm.timestamp.toEpochSecond() * 1000,
+      pendingIntent // TODO: change intent to activity where user can cancel alarm
+    ) // accepts in milliseconds
     // Inserts or updates alarm with same pending intent request code
     alarmManager.setAlarmClock(
-      alarmClockInfo,
-      pendingIntent // intent which will be triggered when alarm is fired
+      alarmClockInfo, pendingIntent // intent which will be triggered when alarm is fired
     )
   }
 

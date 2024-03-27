@@ -47,16 +47,15 @@ class DeleteAlarm(private val repository: AlarmRepository) {
 class ValidateAlarm(private val scheduler: AlarmScheduler) {
   suspend operator fun invoke(
     alarm: Alarm,
-  ): Boolean =
-    when {
-      alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() // accepts in milliseconds
-      -> throw InvalidAlarmException("timestamp can't be less than current time")
+  ): Boolean = when {
+    alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() // accepts in milliseconds
+    -> throw InvalidAlarmException("timestamp can't be less than current time")
 
-      !scheduler.canSchedule() -> throw SecurityException(
-        "Can't schedule alarm without permission from user"
-      )
+    !scheduler.canSchedule() -> throw SecurityException(
+      "Can't schedule alarm without permission from user"
+    )
 
-      else -> true
-    }
+    else -> true
+  }
 
 }

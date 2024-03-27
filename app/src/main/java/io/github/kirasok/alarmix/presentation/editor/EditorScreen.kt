@@ -1,3 +1,5 @@
+@file:Suppress("UnnecessaryOptInAnnotation")
+
 package io.github.kirasok.alarmix.presentation.editor
 
 import androidx.compose.foundation.layout.Arrangement
@@ -25,11 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import io.github.kirasok.alarmix.R
 import kotlinx.coroutines.flow.collectLatest
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hiltViewModel()) {
   val snackbarHostState = remember { SnackbarHostState() }
@@ -42,9 +43,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
     }
   }
 
-  Scaffold(
-    snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-  ) {
+  Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) {
     Column(
       modifier = Modifier
         .fillMaxSize()
@@ -69,8 +68,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
       ElevatedButton(onClick = {
         viewModel.onEvent(
           EditorEvent.SetAlarm(
-            timePickerState.hour.toLong(),
-            timePickerState.minute.toLong()
+            timePickerState.hour.toLong(), timePickerState.minute.toLong()
           )
         )
       }) {

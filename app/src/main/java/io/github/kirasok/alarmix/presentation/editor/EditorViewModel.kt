@@ -28,13 +28,12 @@ class EditorViewModel @Inject constructor(
 
   init {
     savedStateHandle.get<Int>("alarmId")?.let { alarmId ->
-      if (alarmId != -1)
-        viewModelScope.launch {
-          useCases.getAlarmById(alarmId)?.also { alarm ->
-            currentAlarmId = alarm.id
-            time.value = alarm.timestamp
-          }
+      if (alarmId != -1) viewModelScope.launch {
+        useCases.getAlarmById(alarmId)?.also { alarm ->
+          currentAlarmId = alarm.id
+          time.value = alarm.timestamp
         }
+      }
     }
   }
 

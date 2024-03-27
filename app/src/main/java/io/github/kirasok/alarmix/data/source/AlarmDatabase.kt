@@ -7,9 +7,7 @@ import io.github.kirasok.alarmix.domain.converter.ZonedDateTimeConverter
 import io.github.kirasok.alarmix.domain.model.Alarm
 
 @Database(
-  entities = [Alarm::class],
-  version = 1,
-  exportSchema = false
+  entities = [Alarm::class], version = 1, exportSchema = false
 )
 @TypeConverters(ZonedDateTimeConverter::class)
 abstract class AlarmDatabase : RoomDatabase() {

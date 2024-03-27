@@ -6,5 +6,4 @@ import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import javax.inject.Inject
 
 @HiltViewModel
-class AlarmViewModel @Inject constructor(private val useCases: AlarmUseCases) : ViewModel() {
-}
+class AlarmViewModel @Inject constructor(private val useCases: AlarmUseCases) : ViewModel() {}

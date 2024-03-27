@@ -25,15 +25,12 @@ object AppModule {
   @Provides
   @Singleton
   fun providesNoteDatabase(app: Application): AlarmDatabase = Room.databaseBuilder(
-    app,
-    AlarmDatabase::class.java,
-    AlarmDatabase.DATABASE_NAME
+    app, AlarmDatabase::class.java, AlarmDatabase.DATABASE_NAME
   ).build()
 
   @Provides
   @Singleton
-  fun providesNoteRepository(db: AlarmDatabase): AlarmRepository =
-    AlarmRepositoryLocal(db.alarmDao)
+  fun providesNoteRepository(db: AlarmDatabase): AlarmRepository = AlarmRepositoryLocal(db.alarmDao)
 
   @Provides
   @Singleton
@@ -49,11 +46,10 @@ object AppModule {
     repository: AlarmRepository,
     scheduler: AlarmScheduler,
     validator: ValidateAlarm,
-  ): AlarmUseCases =
-    AlarmUseCases(
-      GetAlarms(repository),
-      GetAlarmById(repository),
-      InsertAlarm(repository, validator, scheduler),
-      DeleteAlarm(repository),
-    )
+  ): AlarmUseCases = AlarmUseCases(
+    GetAlarms(repository),
+    GetAlarmById(repository),
+    InsertAlarm(repository, validator, scheduler),
+    DeleteAlarm(repository),
+  )
 }
