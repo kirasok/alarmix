@@ -33,11 +33,11 @@ import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AlarmService : Service() {
+class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener {
 
-  private var isPlaying = false
+  private val context = this
   private lateinit var vibrator: VibratorManager
-  private var mediaPlayer: MediaPlayer? = null // TODO: fix audio
+  private lateinit var mediaPlayer: MediaPlayer
   private lateinit var alarm: Alarm
 
   @Inject
@@ -58,8 +58,6 @@ class AlarmService : Service() {
 
   @SuppressLint("UnspecifiedRegisterReceiverFlag") // RECEIVER_EXPORTED requires TIRAMISU but Android Studio still reports warning
   override fun onCreate() {
-    vibrator = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-
     val intentFilter = IntentFilter(ALARM_ACTION_KEY)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) registerReceiver(
       alarmActionReceiver, intentFilter, RECEIVER_EXPORTED
@@ -67,7 +65,6 @@ class AlarmService : Service() {
     else registerReceiver(
       alarmActionReceiver, intentFilter
     )
-
 
     super.onCreate()
   }
@@ -79,39 +76,47 @@ class AlarmService : Service() {
     //   ?: throw InvalidAlarmException("Alarm can't be null")
     this.alarm = Alarm(id, ZonedDateTime.now())
     Log.d(null, "Got $alarm; timestamp: ${alarm.timestamp}; id: ${alarm.id}")
+
+    mediaPlayer = MediaPlayer()
+    initMediaPlayer()
+
+    vibrator = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+
     startForeground(
       if (alarm.id == 0) 1 else alarm.id, // id can't be 0
       createNotification(),
       ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK // required in Android 14
     )
+
     return START_STICKY
+  }
+
+  private fun initMediaPlayer() = mediaPlayer.apply {
+    setOnPreparedListener(this@AlarmService)
+    setOnErrorListener(this@AlarmService)
+    isLooping = true
+    setDataSource(
+      context, RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM)
+    )
+    setAudioAttributes(AudioAttributes.Builder().apply {
+      setUsage(AudioAttributes.USAGE_ALARM)
+      setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+    }.build())
+    prepare()
   }
 
   override fun onDestroy() {
     unregisterReceiver(alarmActionReceiver)
+    mediaPlayer.stop()
+    mediaPlayer.release()
+    vibrator.cancel()
+    (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(alarm.id)
     ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
     super.onDestroy()
   }
 
-  private fun playMedia() {
-    stopMedia() // If we currently playing
-
-    // Play sound
-    val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-    mediaPlayer = MediaPlayer()
-    mediaPlayer!!.setOnErrorListener { player, _, _ ->
-      player.stop()
-      player.release()
-      mediaPlayer = null
-      true
-    }
-    try {
-      mediaPlayer!!.setDataSource(this, sound)
-      playAlarm(mediaPlayer!!)
-    } catch (e: Exception) {
-      Log.e(null, "Failed to play sound on alarm: ${e.message}")
-    }
-
+  override fun onPrepared(mp: MediaPlayer?) {
+    mp?.start()
     val combinedVibration = CombinedVibration.createParallel(
       VibrationEffect.createWaveform(
         longArrayOf(
@@ -125,28 +130,14 @@ class AlarmService : Service() {
     else vibrator.vibrate(combinedVibration)
   }
 
-  private fun playAlarm(player: MediaPlayer) {
-    player.isLooping = true
-    val audioAttributes = AudioAttributes.Builder().apply {
-      setUsage(AudioAttributes.USAGE_ALARM)
-      setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-    }.build()
-    player.setAudioAttributes(audioAttributes)
-    player.prepare()
-    player.start()
-  }
-
-  private fun stopMedia() {
-    if (!isPlaying) return
-    isPlaying = false
-    if (mediaPlayer != null) {
-      mediaPlayer?.stop()
-      mediaPlayer?.release()
-      mediaPlayer = null
+  override fun onError(mp: MediaPlayer?, what: Int, extra: Int): Boolean {
+    mp?.apply {
+      stop()
+      release()
+      reset()
+      initMediaPlayer()
     }
-
-    vibrator.cancel()
-    (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(alarm.id)
+    return true
   }
 
   private fun createNotification(): Notification {
