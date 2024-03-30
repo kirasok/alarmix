@@ -35,7 +35,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener {
 
-  private val context = this
+  private val context = this // Used within mediaPlayer.apply{} to access context
   private lateinit var vibrator: VibratorManager
   private lateinit var mediaPlayer: MediaPlayer
   private lateinit var alarm: Alarm
@@ -43,6 +43,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
   @Inject
   lateinit var useCases: AlarmUseCases
 
+  // Receiver that triggers when user presses button in notification
   private val alarmActionReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       when (intent.getStringExtra(ALARM_ACTION_KEY)?.let { AlarmAction.valueOf(it) }) {
@@ -74,7 +75,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
       ?: throw IllegalStateException("Alarm id can't be null")
     // val alarm = runBlocking { useCases.getAlarmById(id) } TODO: fix getting alarm
     //   ?: throw InvalidAlarmException("Alarm can't be null")
-    this.alarm = Alarm(id, ZonedDateTime.now())
+    this.alarm = Alarm(id, ZonedDateTime.now()) // TODO: remove this when alarm is fixed
     Log.d(null, "Got $alarm; timestamp: ${alarm.timestamp}; id: ${alarm.id}")
 
     mediaPlayer = MediaPlayer()
@@ -94,14 +95,14 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
   private fun initMediaPlayer() = mediaPlayer.apply {
     setOnPreparedListener(this@AlarmService)
     setOnErrorListener(this@AlarmService)
-    isLooping = true
+    isLooping = true // repeats sound infinitely
     setDataSource(
-      context, RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM)
+      context, RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM) // Only getActualDefaultRingtoneUri doesn't throw SecurityException for not having READ_PRIVILEGED_PHONE_STATE
     )
     setAudioAttributes(AudioAttributes.Builder().apply {
       setUsage(AudioAttributes.USAGE_ALARM)
       setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-    }.build())
+    }.build()) // sets attribute that the sound is an alarm
     prepare()
   }
 
@@ -117,6 +118,8 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
 
   override fun onPrepared(mp: MediaPlayer?) {
     mp?.start()
+
+    // Handles vibrations
     val combinedVibration = CombinedVibration.createParallel(
       VibrationEffect.createWaveform(
         longArrayOf(
@@ -141,6 +144,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
   }
 
   private fun createNotification(): Notification {
+    // Starts activity on click on notification
     val pendingIntent = PendingIntent.getActivity(
       this, alarm.id, Intent(this, MainActivity::class.java).apply {
         addFlags(
@@ -170,7 +174,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
       setOngoing(true) // User can't dismiss notification
       setPriority(NotificationCompat.PRIORITY_MAX)
       setCategory(NotificationCompat.CATEGORY_ALARM)
-      foregroundServiceBehavior = FOREGROUND_SERVICE_IMMEDIATE
+      foregroundServiceBehavior = FOREGROUND_SERVICE_IMMEDIATE // Shows notification in foreground
       setFullScreenIntent(pendingIntent, true)
       addAction(dismissAction)
       addAction(snoozeAction)

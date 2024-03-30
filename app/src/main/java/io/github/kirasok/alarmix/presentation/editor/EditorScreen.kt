@@ -51,7 +51,7 @@ fun EditorScreen(navController: NavController, viewModel: EditorViewModel = hilt
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
-      val initialHour = 7
+      val initialHour = 7 // TODO: set initial hour and minute by checking viewModel.time because we could be editing alarm instead of creating new one; use time difference between .now() and time when alarm would be fired for initial hour and minute in case of editing alarm
       val initialMinute = 30
       val timePickerState = rememberTimePickerState(initialHour, initialMinute)
 

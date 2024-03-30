@@ -11,10 +11,11 @@ class AlarmReceiver : BroadcastReceiver() {
     val serviceIntent =
       Intent(context, AlarmService::class.java).putExtra(INTENT_EXTRA_ALARM_ID, id)
     // We need to use foreground service because we can't start activity from broadcast receiver
+    // Instead, the best practice is to show user notification with foreground service
     context.startForegroundService(serviceIntent)
   }
 
   companion object {
-    const val INTENT_EXTRA_ALARM_ID = "intent_extra_alarm_id"
+    const val INTENT_EXTRA_ALARM_ID = "intent_extra_alarm_id" // value for passing alarm id within intent
   }
 }

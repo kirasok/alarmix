@@ -11,7 +11,7 @@ data class AlarmUseCases(
   val getAlarmById: GetAlarmById,
   val insertAlarm: InsertAlarm,
   val deleteAlarm: DeleteAlarm,
-  // We don't need ValidateAlarm because it's used in insertAlarm, not in presentation layer
+  // We don't need ValidateAlarm there because it's used in insertAlarm, not in presentation layer
 )
 
 class GetAlarms(private val repository: AlarmRepository) {
