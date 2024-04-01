@@ -50,7 +50,3 @@ runs:
         CHANGELOG="${{ steps.generate-notes.outputs.result }}"
         echo -e "$CHANGELOG"
         printf "$CHANGELOG" > ./app/build/outputs/changelogGithub
-
-        echo "Beta Changelog:"
-        git log --format="* %s" HEAD^..HEAD
-        git log --format="* %s" HEAD^..HEAD > ./app/build/outputs/changelogBeta
