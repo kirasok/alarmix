@@ -1,23 +1,9 @@
-import java.util.Properties
-import java.io.FileInputStream
-
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
   id("com.google.devtools.ksp")
   id("com.google.dagger.hilt.android")
 }
-
-// Create a variable called keystorePropertiesFile, and initialize it to your
-// keystore.properties file, in the rootProject folder.
-val keystorePropertiesFile = rootProject.file("key.properties")
-
-// Initialize a new Properties() object called keystoreProperties.
-val keystoreProperties = Properties()
-
-// Load your keystore.properties file into the keystoreProperties object.
-keystoreProperties.load(FileInputStream(keystorePropertiesFile))
-
 
 android {
   namespace = "io.github.kirasok.alarmix"
@@ -27,8 +13,8 @@ android {
     applicationId = "io.github.kirasok.alarmix"
     minSdk = 31
     targetSdk = 34
-    versionCode = 2
-    versionName = "0.1.1"
+    versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
+    versionName = project.version.toString() // We pass it with -Pversion=<tag>
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
@@ -38,10 +24,10 @@ android {
 
   signingConfigs {
     create("release") {
-      keyAlias = keystoreProperties["keyAlias"] as String
-      keyPassword = keystoreProperties["keyPassword"] as String
-      storeFile = file(keystoreProperties["storeFile"] as String)
-      storePassword = keystoreProperties["storePassword"] as String
+      storeFile = file(System.getenv("KEYSTORE_PATH") ?: "release_keystore.keystore")
+      storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
+      keyAlias = System.getenv("KEYSTORE_ALIAS") ?: ""
+      keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: ""
     }
   }
 
