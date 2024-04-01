@@ -45,7 +45,7 @@ jobs:
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_ALIAS_PASSWORD }}
           VERSION_CODE: ${{ steps.rel_number.outputs.version-code }}
         run: |
-          ./gradlew :app:assembleRelease
+          ./gradlew -Pversion=${{steps.rel_number.outputs.version}} :app:assembleRelease
       - name: Archive Build
         uses: actions/upload-artifact@v4
         with:
