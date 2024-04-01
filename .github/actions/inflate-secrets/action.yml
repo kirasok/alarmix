@@ -1,0 +1,15 @@
+name: "Inflate Secrets"
+description: "Inflates the secret values into the appropriate files"
+inputs:
+  keystore:
+    description: "The keystore to inflate"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Inflate release_keystore.keystore
+      shell: bash
+      env:
+        KEYSTORE: ${{ inputs.keystore }}
+      run: |
+        echo $KEYSTORE | base64 --decode > app/release_keystore.keystore
