@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Alarmix"
-include ':app'
+include (":app")
