@@ -12,4 +12,4 @@ runs:
       env:
         KEYSTORE: ${{ inputs.keystore }}
       run: |
-        echo $KEYSTORE | base64 --decode > app/release_keystore.keystore
+        echo "$KEYSTORE" | base64 --decode > app/release_keystore.keystore
