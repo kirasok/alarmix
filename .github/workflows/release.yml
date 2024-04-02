@@ -1,10 +1,10 @@
 name: On Tag
-on:
+on: # triggers workflow on tag like 1.0.1
   push:
     tags:
       - "*.*.*"
 jobs:
-  version:
+  version: # Get version and version-code of build
     name: Get version
     runs-on: ubuntu-latest
     outputs:
@@ -15,17 +15,17 @@ jobs:
         id: version-generator
         shell: bash
         run: |
-          COMMITS=$(git rev-list --count HEAD)
-          TAGS=$(git tag | grep -cv beta)
-          VC=$((((COMMITS+TAGS) * 3) << 1))
-          VERSION=$(git tag | tail -1)
+          COMMITS=$(git rev-list --count HEAD) # counts commits
+          TAGS=$(git tag | grep -cv beta) # counts tags excluding tags that contain 'beta'
+          VC=$((((COMMITS+TAGS) * 3) << 1)) # formula to count version-code
+          VERSION=$(git tag | tail -1) # use last tag as version
           echo Number Commits "$COMMITS"
           echo Number Tags "$TAGS"
           echo Version Code "$VC"
           echo Version "$VERSION"
           echo "version-code=$VC" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-  changelog:
+  changelog: # generate changelog for changes between last release and last tag
     name: Generate changelog
     runs-on: ubuntu-latest
     needs: version
@@ -59,7 +59,7 @@ jobs:
               previous_tag_name: '${{ steps.latest-release-tag.outputs.result }}',
             })
             return data.body.replaceAll('`', '\'').replaceAll('"', '\'')
-  apk_build:
+  apk_build: # build apk for github
     name: APK build
     runs-on: ubuntu-latest
     needs: version
@@ -91,16 +91,16 @@ jobs:
           VERSION_CODE: ${{ needs.version.outputs.version-code }}
         run: |
           ./gradlew -Pversion=${{needs.version.outputs.version}} :app:assembleRelease
-      - name: Archive Build
+      - name: Archive Build # upload apk to be used in deploy job
         id: upload-apk
         uses: actions/upload-artifact@v4
         with:
           name: app
           path: ./**/*.apk
-  github_deploy:
+  github_deploy: # deploy to github releases
     name: Deploy to Github release
     runs-on: ubuntu-latest
-    needs: [version, changelog, apk_build]
+    needs: [version, changelog, apk_build] # depends on all previous jobs
     permissions:
       contents: write
     steps:
@@ -108,7 +108,7 @@ jobs:
         id: download
         with:
           name: ${{ needs.apk_build.outputs.app }}
-          merge-multiple: true
+          merge-multiple: true # if there's more than 1 artifact with the same name, it will merge them in one folder
       - name: Create Github Release
         uses: softprops/action-gh-release@v2.0.4
         with:
