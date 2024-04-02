@@ -74,16 +74,11 @@ jobs:
           java-version: "17"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - uses: timheuer/base64-to-file@v1.2.4
-        name: Get keystore
-        with:
-          fileName: "release_keystore.keystore"
-          fileDir: "."
-          encodedString: ${{ secrets.ORIGINAL_KEYSTORE_FILE }}
       - uses: gradle/wrapper-validation-action@v2
         name: Validate Gradle Wrapper
       - name: Build Release
         env:
+          KEYSTORE: ${{secrets.ORIGINAL_KEYSTORE_FILE}}
           KEYSTORE_PATH: release_keystore.keystore
           KEYSTORE_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
           KEYSTORE_ALIAS: ${{ secrets.ORIGINAL_KEYSTORE_ALIAS }}
