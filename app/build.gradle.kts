@@ -18,7 +18,7 @@ android {
     targetSdk = 34
     versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
     versionName =
-      if (project.version == "unspecified") throw Exception("Specify project.version with -Pversion") else project.version.toString() // We pass it with -Pversion=<tag>
+      if (project.version == "unspecified") "0.0.0" else project.version.toString() // We pass it with -Pversion=<tag>
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
@@ -31,7 +31,8 @@ android {
       val keystore = File(projectDir, System.getenv("KEYSTORE_PATH") ?: "keystore.keystore").apply {
         ensureParentDirsCreated()
         createNewFile()
-        writeBytes(Base64.getDecoder().decode(System.getenv("KEYSTORE")))
+        val base64: String = System.getenv("KEYSTORE")?.replace("\n", "") ?: "" // Base64 doesn't consider string valid if it has \n character
+        writeBytes(Base64.getDecoder().decode(base64))
       }
       storeFile = keystore
       storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
