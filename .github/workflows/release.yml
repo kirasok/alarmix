@@ -32,14 +32,17 @@ jobs:
         with:
           tag-name: ${{ steps.rel_number.outputs.version }}
           gh-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: ./.github/actions/inflate-secrets
-        name: Inflate Secrets
+      - uses: timheuer/base64-to-file@v1.2.4
+        name: Get keystore
         with:
-          keystore: ${{ secrets.ORIGINAL_KEYSTORE_FILE }}
+          fileName: "release_keystore.keystore"
+          fileDir: "."
+          encodedString: ${{ secrets.ORIGINAL_KEYSTORE_FILE }}
       - uses: gradle/wrapper-validation-action@v2
         name: Validate Gradle Wrapper
       - name: Build Release
         env:
+          KEYSTORE_PATH: release_keystore.keystore
           KEYSTORE_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
           KEYSTORE_ALIAS: ${{ secrets.ORIGINAL_KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
