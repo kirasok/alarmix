@@ -110,4 +110,4 @@ jobs:
           tag_name: ${{ needs.version.outputs.version }}
           body: ${{ needs.changelog.outputs.changelog }}
           files: |
-            ${{steps.download.outputs.download-path}}/*
+            ${{steps.download.outputs.download-path}}/**/*
