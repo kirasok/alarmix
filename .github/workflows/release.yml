@@ -11,6 +11,7 @@ jobs:
       version-code: ${{ steps.version-generator.outputs.version-code }}
       version: ${{ steps.version-generator.outputs.version }}
     steps:
+      - uses: actions/checkout@v4
       - name: Set Build Number
         id: version-generator
         shell: bash
