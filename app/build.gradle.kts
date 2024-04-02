@@ -27,7 +27,7 @@ android {
 
   signingConfigs {
     create("release") {
-      val keystore = File(projectDir, System.getenv("KEYSTORE_PATH") ?: "")
+      val keystore = File(projectDir, System.getenv("KEYSTORE_PATH") ?: "keystore.keystore")
       keystore.writeBytes(Base64.getDecoder().decode(System.getenv("KEYSTORE")))
       storeFile = keystore
       storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
