@@ -16,7 +16,8 @@ android {
     minSdk = 31
     targetSdk = 34
     versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
-    versionName = project.version.toString() // We pass it with -Pversion=<tag>
+    versionName =
+      if (project.version == "unspecified") throw Exception("Specify project.version with -Pversion") else project.version.toString() // We pass it with -Pversion=<tag>
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
