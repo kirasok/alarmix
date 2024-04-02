@@ -1,3 +1,5 @@
+import java.util.Base64
+
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
@@ -24,7 +26,9 @@ android {
 
   signingConfigs {
     create("release") {
-      storeFile = File(projectDir, System.getenv("KEYSTORE_PATH") ?: "")
+      val keystore = File(projectDir, System.getenv("KEYSTORE_PATH") ?: "")
+      keystore.writeBytes(Base64.getDecoder().decode(System.getenv("KEYSTORE")))
+      storeFile = keystore
       storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
       keyAlias = System.getenv("KEYSTORE_ALIAS") ?: ""
       keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: ""
