@@ -1,3 +1,5 @@
+import java.util.Base64
+
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
@@ -14,7 +16,8 @@ android {
     minSdk = 31
     targetSdk = 34
     versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 1
-    versionName = project.version.toString() // We pass it with -Pversion=<tag>
+    versionName =
+      if (project.version == "unspecified") throw Exception("Specify project.version with -Pversion") else project.version.toString() // We pass it with -Pversion=<tag>
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
@@ -24,7 +27,9 @@ android {
 
   signingConfigs {
     create("release") {
-      storeFile = file(System.getenv("KEYSTORE_PATH") ?: "release_keystore.keystore")
+      val keystore = File(projectDir, System.getenv("KEYSTORE_PATH") ?: "keystore.keystore")
+      keystore.writeBytes(Base64.getDecoder().decode(System.getenv("KEYSTORE")))
+      storeFile = keystore
       storePassword = System.getenv("KEYSTORE_PASSWORD") ?: ""
       keyAlias = System.getenv("KEYSTORE_ALIAS") ?: ""
       keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD") ?: ""

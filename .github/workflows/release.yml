@@ -1,16 +1,70 @@
 name: On Tag
-on:
+on: # triggers workflow on tag like 1.0.1
   push:
     tags:
       - "*.*.*"
-env:
-  SUPPLY_UPLOAD_MAX_RETRIES: 5
 jobs:
-  app_build:
-    name: Github release
+  version: # Get version and version-code of build
+    name: Get version
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      version-code: ${{ steps.version-generator.outputs.version-code }}
+      version: ${{ steps.version-generator.outputs.version }}
+    steps:
+      - name: Set Build Number
+        id: version-generator
+        shell: bash
+        run: |
+          COMMITS=$(git rev-list --count HEAD) # counts commits
+          TAGS=$(git tag | grep -cv beta) # counts tags excluding tags that contain 'beta'
+          VC=$((((COMMITS+TAGS) * 3) << 1)) # formula to count version-code
+          VERSION=$(git tag | tail -1) # use last tag as version
+          echo Number Commits "$COMMITS"
+          echo Number Tags "$TAGS"
+          echo Version Code "$VC"
+          echo Version "$VERSION"
+          echo "version-code=$VC" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+  changelog: # generate changelog for changes between last release and last tag
+    name: Generate changelog
+    runs-on: ubuntu-latest
+    needs: version
+    outputs:
+      changelog: ${{steps.generate-notes.outputs.result}}
+    steps:
+      - name: Get Previous Release Tag
+        uses: actions/github-script@v7
+        id: latest-release-tag
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            const { data } = await github.rest.repos.getLatestRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+            return data.tag_name
+      - name: Get Generated Release Notes
+        uses: actions/github-script@v7
+        id: generate-notes
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN  }}
+          result-encoding: string
+          script: |
+            const { data } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: '${{ needs.version.outputs.version }}',
+              target_commitish: 'main',
+              previous_tag_name: '${{ steps.latest-release-tag.outputs.result }}',
+            })
+            return data.body.replaceAll('`', '\'').replaceAll('"', '\'')
+  apk_build: # build apk for github
+    name: APK build
+    runs-on: ubuntu-latest
+    needs: version
+    outputs:
+      app: ${{steps.upload-apk.outputs.artifact-id}}
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 17
@@ -18,43 +72,42 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "17"
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.2"
-          bundler-cache: true
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - uses: ./.github/actions/create-release-number
-        name: Create Release Number
-        id: rel_number
-      - uses: ./.github/actions/create-release-notes
-        name: Create Release Notes
-        with:
-          tag-name: ${{ steps.rel_number.outputs.version }}
-          gh-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: ./.github/actions/inflate-secrets
-        name: Inflate Secrets
-        with:
-          keystore: ${{ secrets.ORIGINAL_KEYSTORE_FILE }}
       - uses: gradle/wrapper-validation-action@v2
         name: Validate Gradle Wrapper
       - name: Build Release
         env:
+          KEYSTORE: ${{secrets.ORIGINAL_KEYSTORE_FILE}}
+          KEYSTORE_PATH: release_keystore.keystore
           KEYSTORE_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
           KEYSTORE_ALIAS: ${{ secrets.ORIGINAL_KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
-          VERSION_CODE: ${{ steps.rel_number.outputs.version-code }}
+          VERSION_CODE: ${{ needs.version.outputs.version-code }}
         run: |
-          ./gradlew -Pversion=${{steps.rel_number.outputs.version}} :app:assembleRelease
-      - name: Archive Build
+          ./gradlew -Pversion=${{needs.version.outputs.version}} :app:assembleRelease
+      - name: Archive Build # upload apk to be used in deploy job
+        id: upload-apk
         uses: actions/upload-artifact@v4
         with:
+          name: app
           path: ./**/*.apk
+  github_deploy: # deploy to github releases
+    name: Deploy to Github release
+    runs-on: ubuntu-latest
+    needs: [version, changelog, apk_build] # depends on all previous jobs
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        id: download
+        with:
+          name: ${{ needs.apk_build.outputs.app }}
+          merge-multiple: true # if there's more than 1 artifact with the same name, it will merge them in one folder
       - name: Create Github Release
         uses: softprops/action-gh-release@v2.0.4
         with:
-          tag_name: ${{ steps.rel_number.outputs.version }}
-          body_path: ./app/build/outputs/changelogGithub
-          draft: false
+          tag_name: ${{ needs.version.outputs.version }}
+          body: ${{ needs.changelog.outputs.changelog }}
           files: |
-            ./app/build/outputs/apk/release/app-release.apk
+            ${{steps.download.outputs.download-path}}/*
