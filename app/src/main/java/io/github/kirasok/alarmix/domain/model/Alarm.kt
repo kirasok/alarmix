@@ -6,7 +6,7 @@ import java.time.ZonedDateTime
 
 @Entity
 data class Alarm(
-  @PrimaryKey(autoGenerate = true) val id: Int = 0,
+  @PrimaryKey(autoGenerate = true) val id: Int = 0, // id is generated on **db.insert**, not on creation of object
   val timestamp: ZonedDateTime,
 )
 

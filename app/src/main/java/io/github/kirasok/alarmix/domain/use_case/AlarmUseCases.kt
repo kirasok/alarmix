@@ -31,8 +31,9 @@ class InsertAlarm(
     alarm: Alarm,
   ) {
     validate(alarm)
-    scheduler.schedule(alarm)
-    repository.insertAlarm(alarm)
+    val id =
+      repository.insertAlarm(alarm) // alarm.id is set during insertion in DB, repository return id so we can use it in scheduler
+    scheduler.schedule(Alarm(id = id, timestamp = alarm.timestamp))
   }
 }
 

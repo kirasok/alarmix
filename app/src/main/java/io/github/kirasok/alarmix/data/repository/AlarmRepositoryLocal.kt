@@ -10,7 +10,7 @@ class AlarmRepositoryLocal(private val dao: AlarmDao) : AlarmRepository {
 
   override suspend fun getAlarmById(id: Int): Alarm = dao.getAlarmById(id)
 
-  override suspend fun insertAlarm(alarm: Alarm) = dao.insertAlarm(alarm)
+  override suspend fun insertAlarm(alarm: Alarm): Int = dao.insertAlarm(alarm).toInt()
 
   override suspend fun deleteAlarm(alarm: Alarm) = dao.deleteAlarm(alarm)
 }
