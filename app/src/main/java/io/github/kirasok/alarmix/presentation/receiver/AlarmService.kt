@@ -53,7 +53,11 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
           onDestroy()
         }
 
-        AlarmAction.SNOOZE -> onDestroy() // TODO: implement snooze
+        AlarmAction.SNOOZE -> {
+          runBlocking { useCases.insertAlarm(alarm.copy(timestamp = alarm.timestamp.plusMinutes(5))) }
+          onDestroy()
+        }
+
         null -> throw IllegalStateException("Alarm action can't be null")
       }
     }
