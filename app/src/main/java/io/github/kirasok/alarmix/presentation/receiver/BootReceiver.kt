@@ -16,6 +16,7 @@ class BootReceiver : BroadcastReceiver() {
   @Inject
   lateinit var alarmUseCases: AlarmUseCases
   override fun onReceive(context: Context?, intent: Intent?) {
+    if (intent?.action != Intent.ACTION_BOOT_COMPLETED) return
     // Get alarms
     var alarms: List<Alarm> = listOf()
     runBlocking(Dispatchers.IO) {
