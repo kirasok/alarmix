@@ -167,13 +167,13 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     val dismissIntent =
       Intent(ALARM_ACTION_KEY).putExtra(ALARM_ACTION_KEY, AlarmAction.DISMISS.toString())
     val dismissAction =
-      NotificationCompat.Action.Builder(null, "Dismiss", getPendingIntent(dismissIntent, alarm.id))
+      NotificationCompat.Action.Builder(null, "Dismiss", getPendingIntent(dismissIntent, 1))
         .build()
 
     val snoozeIntent =
       Intent(ALARM_ACTION_KEY).putExtra(ALARM_ACTION_KEY, AlarmAction.SNOOZE.toString())
     val snoozeAction =
-      NotificationCompat.Action.Builder(null, "Snooze", getPendingIntent(snoozeIntent, alarm.id))
+      NotificationCompat.Action.Builder(null, "Snooze", getPendingIntent(snoozeIntent, 2))
         .build()
 
     return NotificationCompat.Builder(
@@ -199,7 +199,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
 
   companion object {
 
-    const val ALARM_ACTION_KEY = "alarm_action_key"
+    const val ALARM_ACTION_KEY = "io.github.kirasok.alarm_action_key"
 
     enum class AlarmAction {
       DISMISS, SNOOZE
