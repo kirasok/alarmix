@@ -50,6 +50,6 @@ object AppModule {
     GetAlarms(repository),
     GetAlarmById(repository),
     InsertAlarm(repository, validator, scheduler),
-    DeleteAlarm(repository),
+    DeleteAlarm(repository, scheduler),
   )
 }

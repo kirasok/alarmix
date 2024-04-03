@@ -38,10 +38,11 @@ class InsertAlarm(
   }
 }
 
-class DeleteAlarm(private val repository: AlarmRepository) {
+class DeleteAlarm(private val repository: AlarmRepository, private val scheduler: AlarmScheduler) {
   suspend operator fun invoke(
     alarm: Alarm,
   ) {
+    scheduler.cancel(alarm)
     repository.deleteAlarm(alarm)
   }
 }
