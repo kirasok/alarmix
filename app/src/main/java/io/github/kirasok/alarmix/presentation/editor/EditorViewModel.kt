@@ -1,5 +1,7 @@
 package io.github.kirasok.alarmix.presentation.editor
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,6 +13,7 @@ import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -20,6 +23,11 @@ class EditorViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
   private val time = mutableStateOf<ZonedDateTime?>(null)
+
+  private val _initialHour = mutableIntStateOf(7)
+  val initialHour: State<Int> = _initialHour
+  private val _initialMinute = mutableIntStateOf(30)
+  val initialMinute: State<Int> = _initialMinute
 
   private val _eventFlow = MutableSharedFlow<UiEvent>()
   val eventFlow = _eventFlow.asSharedFlow()
@@ -32,6 +40,9 @@ class EditorViewModel @Inject constructor(
         useCases.getAlarmById(alarmId)?.also { alarm ->
           currentAlarmId = alarm.id
           time.value = alarm.timestamp
+          val diff = Duration.between(time.value, ZonedDateTime.now())
+          _initialHour.intValue = diff.toHoursPart()
+          _initialMinute.intValue = diff.toMinutesPart()
         }
       }
     }
