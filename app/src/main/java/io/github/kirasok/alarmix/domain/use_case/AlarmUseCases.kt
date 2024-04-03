@@ -32,7 +32,8 @@ class InsertAlarm(
     validate(alarm)
     val id =
       repository.insertAlarm(alarm) // alarm.id is set during insertion in DB, repository return id so we can use it in scheduler
-    scheduler.schedule(alarm.copy(id = id))
+    if (alarm.enabled)
+      scheduler.schedule(alarm.copy(id = id))
   }
 }
 
