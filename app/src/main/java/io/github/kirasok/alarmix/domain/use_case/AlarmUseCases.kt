@@ -4,7 +4,6 @@ import io.github.kirasok.alarmix.domain.model.Alarm
 import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.domain.repository.AlarmScheduler
-import kotlinx.coroutines.flow.Flow
 
 data class AlarmUseCases(
   val getAlarms: GetAlarms,
@@ -15,7 +14,7 @@ data class AlarmUseCases(
 )
 
 class GetAlarms(private val repository: AlarmRepository) {
-  operator fun invoke(): Flow<List<Alarm>> = repository.getAlarms()
+  suspend operator fun invoke(): List<Alarm> = repository.getAlarms()
 }
 
 class GetAlarmById(private val repository: AlarmRepository) {
