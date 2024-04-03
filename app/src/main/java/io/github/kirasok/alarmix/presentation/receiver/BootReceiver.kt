@@ -3,14 +3,14 @@ package io.github.kirasok.alarmix.presentation.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import io.github.kirasok.alarmix.domain.model.Alarm
+import dagger.hilt.android.AndroidEntryPoint
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.runBlocking
+import java.time.ZonedDateTime
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class BootReceiver : BroadcastReceiver() {
 
   @Inject
@@ -18,14 +18,15 @@ class BootReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context?, intent: Intent?) {
     if (intent?.action != Intent.ACTION_BOOT_COMPLETED) return
     // Get alarms
-    var alarms: List<Alarm> = listOf()
-    runBlocking(Dispatchers.IO) {
-      alarmUseCases.getAlarms().catch { Log.e(null, it.toString()) }.collect { alarms = it }
-    }
+    val alarms = runBlocking(Dispatchers.IO) { alarmUseCases.getAlarms() }
 
-    // Enable enabled alarms
+    // Enable enabled alarms which timestamp is after now
     alarms.forEach {
-      if (it.enabled) runBlocking(Dispatchers.IO) { alarmUseCases.insertAlarm(it) } // On insert, alarm will be validated, replaced in DB and scheduled
+      if (it.enabled && it.timestamp.isAfter(ZonedDateTime.now())) {
+        runBlocking(Dispatchers.IO) { alarmUseCases.insertAlarm(it) } // On insert, alarm will be validated, replaced in DB and scheduled
+      } else if (it.enabled) { // Disable alarms which timestamp is in past
+        runBlocking(Dispatchers.IO) { alarmUseCases.insertAlarm(it.copy(enabled = false)) }
+      }
     }
   }
 }
