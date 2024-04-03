@@ -4,7 +4,6 @@ import io.github.kirasok.alarmix.domain.model.Alarm
 import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.domain.repository.AlarmScheduler
-import kotlinx.coroutines.flow.Flow
 
 data class AlarmUseCases(
   val getAlarms: GetAlarms,
@@ -15,7 +14,7 @@ data class AlarmUseCases(
 )
 
 class GetAlarms(private val repository: AlarmRepository) {
-  operator fun invoke(): Flow<List<Alarm>> = repository.getAlarms()
+  suspend operator fun invoke(): List<Alarm> = repository.getAlarms()
 }
 
 class GetAlarmById(private val repository: AlarmRepository) {
@@ -33,7 +32,8 @@ class InsertAlarm(
     validate(alarm)
     val id =
       repository.insertAlarm(alarm) // alarm.id is set during insertion in DB, repository return id so we can use it in scheduler
-    scheduler.schedule(Alarm(id = id, timestamp = alarm.timestamp))
+    if (alarm.enabled)
+      scheduler.schedule(alarm.copy(id = id))
   }
 }
 
@@ -49,7 +49,7 @@ class ValidateAlarm(private val scheduler: AlarmScheduler) {
   suspend operator fun invoke(
     alarm: Alarm,
   ): Boolean = when {
-    alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() // accepts in milliseconds
+    alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() && alarm.enabled // accepts in milliseconds
     -> throw InvalidAlarmException("timestamp can't be less than current time")
 
     !scheduler.canSchedule() -> throw SecurityException(
