@@ -1,9 +1,11 @@
 package io.github.kirasok.alarmix.domain.use_case
 
 import io.github.kirasok.alarmix.domain.model.Alarm
+import io.github.kirasok.alarmix.domain.model.InvalidAlarmError
 import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.domain.repository.AlarmScheduler
+import java.time.ZonedDateTime
 
 data class AlarmUseCases(
   val getAlarms: GetAlarms,
@@ -32,8 +34,7 @@ class InsertAlarm(
     validate(alarm)
     val id =
       repository.insertAlarm(alarm) // alarm.id is set during insertion in DB, repository return id so we can use it in scheduler
-    if (alarm.enabled)
-      scheduler.schedule(alarm.copy(id = id))
+    scheduler.schedule(alarm.copy(id = id))
   }
 }
 
@@ -46,11 +47,11 @@ class DeleteAlarm(private val repository: AlarmRepository) {
 }
 
 class ValidateAlarm(private val scheduler: AlarmScheduler) {
-  suspend operator fun invoke(
+  operator fun invoke(
     alarm: Alarm,
   ): Boolean = when {
-    alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() && alarm.enabled // accepts in milliseconds
-    -> throw InvalidAlarmException("timestamp can't be less than current time")
+    alarm.timestamp.isBefore(ZonedDateTime.now())
+    -> throw InvalidAlarmException(InvalidAlarmError.PAST_TIMESTAMP)
 
     !scheduler.canSchedule() -> throw SecurityException(
       "Can't schedule alarm without permission from user"

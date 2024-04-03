@@ -20,13 +20,13 @@ import android.os.IBinder
 import android.os.VibrationAttributes
 import android.os.VibrationEffect
 import android.os.VibratorManager
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.kirasok.alarmix.NotificationChannels
 import io.github.kirasok.alarmix.R
 import io.github.kirasok.alarmix.domain.model.Alarm
+import io.github.kirasok.alarmix.domain.model.InvalidAlarmError
 import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import io.github.kirasok.alarmix.presentation.MainActivity
@@ -48,7 +48,11 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
   private val alarmActionReceiver = object : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
       when (intent.getStringExtra(ALARM_ACTION_KEY)?.let { AlarmAction.valueOf(it) }) {
-        AlarmAction.DISMISS -> onDestroy()
+        AlarmAction.DISMISS -> {
+          runBlocking { useCases.deleteAlarm(alarm) }
+          onDestroy()
+        }
+
         AlarmAction.SNOOZE -> onDestroy() // TODO: implement snooze
         null -> throw IllegalStateException("Alarm action can't be null")
       }
@@ -75,7 +79,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     val id = intent?.getIntExtra(AlarmReceiver.INTENT_EXTRA_ALARM_ID, -1).takeIf { it != -1 }
       ?: throw IllegalStateException("Alarm id can't be null")
     alarm = runBlocking { useCases.getAlarmById(id) }
-      ?: throw InvalidAlarmException("Alarm can't be null")
+      ?: throw InvalidAlarmException(InvalidAlarmError.NULL_ALARM)
 
     mediaPlayer = MediaPlayer()
     initMediaPlayer()
