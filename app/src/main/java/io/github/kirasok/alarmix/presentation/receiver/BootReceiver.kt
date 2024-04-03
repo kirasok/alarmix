@@ -4,10 +4,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import dagger.hilt.android.AndroidEntryPoint
+import io.github.kirasok.alarmix.domain.model.InvalidAlarmError
+import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import java.time.ZonedDateTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -20,12 +21,17 @@ class BootReceiver : BroadcastReceiver() {
     // Get alarms
     val alarms = runBlocking(Dispatchers.IO) { alarmUseCases.getAlarms() }
 
-    // Enable enabled alarms which timestamp is after now
-    alarms.forEach {
-      if (it.enabled && it.timestamp.isAfter(ZonedDateTime.now())) {
-        runBlocking(Dispatchers.IO) { alarmUseCases.insertAlarm(it) } // On insert, alarm will be validated, replaced in DB and scheduled
-      } else if (it.enabled) { // Disable alarms which timestamp is in past
-        runBlocking(Dispatchers.IO) { alarmUseCases.insertAlarm(it.copy(enabled = false)) }
+    // Insert each alarm
+    alarms.forEach { alarm ->
+      runBlocking {
+        try {
+          alarmUseCases.insertAlarm(alarm) // insertAlarm validates alarm and throws InvalidAlarmException if alarm is not valid
+        } catch (e: InvalidAlarmException) {
+          when (e.invalidAlarmError) {
+            InvalidAlarmError.PAST_TIMESTAMP -> alarmUseCases.deleteAlarm(alarm) // If alarm has past timestamp then we delete it
+            else -> {}
+          }
+        }
       }
     }
   }

@@ -14,5 +14,5 @@ data class InvalidAlarmException(val invalidAlarmError: InvalidAlarmError) :
   Exception(invalidAlarmError.toString())
 
 enum class InvalidAlarmError {
-  PAST_TIMESTAMP
+  PAST_TIMESTAMP, NULL_ALARM
 }
