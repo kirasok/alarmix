@@ -27,9 +27,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.github.kirasok.alarmix.NotificationChannels
 import io.github.kirasok.alarmix.R
 import io.github.kirasok.alarmix.domain.model.Alarm
+import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import io.github.kirasok.alarmix.presentation.MainActivity
-import java.time.ZonedDateTime
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -73,10 +74,8 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val id = intent?.getIntExtra(AlarmReceiver.INTENT_EXTRA_ALARM_ID, -1).takeIf { it != -1 }
       ?: throw IllegalStateException("Alarm id can't be null")
-    // val alarm = runBlocking { useCases.getAlarmById(id) } TODO: fix getting alarm
-    //   ?: throw InvalidAlarmException("Alarm can't be null")
-    this.alarm = Alarm(id, ZonedDateTime.now()) // TODO: remove this when alarm is fixed
-    Log.d(null, "Got $alarm; timestamp: ${alarm.timestamp}; id: ${alarm.id}")
+    alarm = runBlocking { useCases.getAlarmById(id) }
+      ?: throw InvalidAlarmException("Alarm can't be null")
 
     mediaPlayer = MediaPlayer()
     initMediaPlayer()
@@ -97,7 +96,11 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     setOnErrorListener(this@AlarmService)
     isLooping = true // repeats sound infinitely
     setDataSource(
-      context, RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_ALARM) // Only getActualDefaultRingtoneUri doesn't throw SecurityException for not having READ_PRIVILEGED_PHONE_STATE
+      context,
+      RingtoneManager.getActualDefaultRingtoneUri(
+        context,
+        RingtoneManager.TYPE_ALARM
+      ) // Only getActualDefaultRingtoneUri doesn't throw SecurityException for not having READ_PRIVILEGED_PHONE_STATE
     )
     setAudioAttributes(AudioAttributes.Builder().apply {
       setUsage(AudioAttributes.USAGE_ALARM)
