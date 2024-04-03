@@ -49,7 +49,7 @@ class ValidateAlarm(private val scheduler: AlarmScheduler) {
   suspend operator fun invoke(
     alarm: Alarm,
   ): Boolean = when {
-    alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() // accepts in milliseconds
+    alarm.timestamp.toEpochSecond() * 1000 < System.currentTimeMillis() && alarm.enabled // accepts in milliseconds
     -> throw InvalidAlarmException("timestamp can't be less than current time")
 
     !scheduler.canSchedule() -> throw SecurityException(
