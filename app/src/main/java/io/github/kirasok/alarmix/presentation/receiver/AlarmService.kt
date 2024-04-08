@@ -54,7 +54,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         }
 
         AlarmAction.SNOOZE -> {
-          runBlocking { useCases.insertAlarm(alarm.copy(timestamp = alarm.timestamp.plusMinutes(5))) }
+          runBlocking { useCases.scheduleAlarm(alarm.copy(timestamp = alarm.timestamp.plusMinutes(5))) }
           onDestroy()
         }
 

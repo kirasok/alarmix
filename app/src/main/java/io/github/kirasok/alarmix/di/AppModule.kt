@@ -15,7 +15,7 @@ import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
 import io.github.kirasok.alarmix.domain.use_case.DeleteAlarm
 import io.github.kirasok.alarmix.domain.use_case.GetAlarmById
 import io.github.kirasok.alarmix.domain.use_case.GetAlarms
-import io.github.kirasok.alarmix.domain.use_case.InsertAlarm
+import io.github.kirasok.alarmix.domain.use_case.ScheduleAlarm
 import io.github.kirasok.alarmix.domain.use_case.ValidateAlarm
 import javax.inject.Singleton
 
@@ -49,7 +49,7 @@ object AppModule {
   ): AlarmUseCases = AlarmUseCases(
     GetAlarms(repository),
     GetAlarmById(repository),
-    InsertAlarm(repository, validator, scheduler),
+    ScheduleAlarm(repository, validator, scheduler),
     DeleteAlarm(repository, scheduler),
   )
 }

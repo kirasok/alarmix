@@ -10,7 +10,7 @@ import java.time.ZonedDateTime
 data class AlarmUseCases(
   val getAlarms: GetAlarms,
   val getAlarmById: GetAlarmById,
-  val insertAlarm: InsertAlarm,
+  val scheduleAlarm: ScheduleAlarm,
   val deleteAlarm: DeleteAlarm,
   // We don't need ValidateAlarm there because it's used in insertAlarm, not in presentation layer
 )
@@ -23,7 +23,7 @@ class GetAlarmById(private val repository: AlarmRepository) {
   suspend operator fun invoke(id: Int): Alarm? = repository.getAlarmById(id)
 }
 
-class InsertAlarm(
+class ScheduleAlarm(
   private val repository: AlarmRepository,
   private val validate: ValidateAlarm,
   private val scheduler: AlarmScheduler,
