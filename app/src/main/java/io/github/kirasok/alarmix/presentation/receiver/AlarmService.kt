@@ -164,7 +164,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         addFlags(
           Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
         )
-        putExtra(BUNDLE_ACTION_KEY, BundleAction.OPEN_DISMISS_SCREEN)
+        putExtra(BUNDLE_ACTION_KEY, BundleAction.OPEN_DISMISS_SCREEN.toString())
         putExtra(BUNDLE_ALARM_ID_KEY, alarm.id)
       }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
