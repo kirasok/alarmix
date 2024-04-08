@@ -1,6 +1,7 @@
 package io.github.kirasok.alarmix.presentation.dismiss
 
 import android.app.Activity
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -40,7 +42,11 @@ fun DismissScreen(navController: NavController, viewModel: DismissViewModel = hi
   if (finishAlarm.value) (LocalContext.current as Activity?)?.finish()
 
   Scaffold {
-    Column(modifier = Modifier.padding(it)) {
+    Column(
+      modifier = Modifier.padding(it),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
       if (viewModel.alarm.value != null) {
         Text(
           text = viewModel.alarm.value!!.timestamp.format(
@@ -50,7 +56,7 @@ fun DismissScreen(navController: NavController, viewModel: DismissViewModel = hi
           )
         )
 
-        Row {
+        Row(horizontalArrangement = Arrangement.Center) {
           ElevatedButton(onClick = { viewModel.onEvent(DismissEvent.DismissAlarm) }) {
             Text(text = "Dismiss")
           }
