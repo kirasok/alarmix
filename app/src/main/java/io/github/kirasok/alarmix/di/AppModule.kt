@@ -16,6 +16,7 @@ import io.github.kirasok.alarmix.domain.use_case.CancelAlarm
 import io.github.kirasok.alarmix.domain.use_case.GetAlarmById
 import io.github.kirasok.alarmix.domain.use_case.GetAlarms
 import io.github.kirasok.alarmix.domain.use_case.ScheduleAlarm
+import io.github.kirasok.alarmix.domain.use_case.SnoozeAlarm
 import io.github.kirasok.alarmix.domain.use_case.ValidateAlarm
 import javax.inject.Singleton
 
@@ -46,10 +47,18 @@ object AppModule {
     repository: AlarmRepository,
     scheduler: AlarmScheduler,
     validator: ValidateAlarm,
-  ): AlarmUseCases = AlarmUseCases(
-    GetAlarms(repository),
-    GetAlarmById(repository),
-    ScheduleAlarm(repository, validator, scheduler),
-    CancelAlarm(repository, scheduler),
-  )
+  ): AlarmUseCases {
+    val getAlarms = GetAlarms(repository)
+    val getAlarmById = GetAlarmById(repository)
+    val scheduleAlarm = ScheduleAlarm(repository, validator, scheduler)
+    val cancelAlarm = CancelAlarm(repository, scheduler)
+    val snoozeAlarm = SnoozeAlarm(scheduleAlarm)
+    return AlarmUseCases(
+      getAlarms,
+      getAlarmById,
+      scheduleAlarm,
+      cancelAlarm,
+      snoozeAlarm
+    )
+  }
 }

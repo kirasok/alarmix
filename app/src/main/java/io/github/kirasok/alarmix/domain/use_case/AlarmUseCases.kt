@@ -12,6 +12,7 @@ data class AlarmUseCases(
   val getAlarmById: GetAlarmById,
   val scheduleAlarm: ScheduleAlarm,
   val cancelAlarm: CancelAlarm,
+  val snoozeAlarm: SnoozeAlarm,
   // We don't need ValidateAlarm there because it's used in insertAlarm, not in presentation layer
 )
 
@@ -44,6 +45,13 @@ class CancelAlarm(private val repository: AlarmRepository, private val scheduler
   ) {
     scheduler.cancel(alarm)
     repository.deleteAlarm(alarm)
+  }
+}
+
+class SnoozeAlarm(private val scheduleAlarm: ScheduleAlarm) {
+  suspend operator fun invoke(alarm: Alarm) {
+    // DB entry is updated on insert, so we don't need to delete it before scheduling
+    scheduleAlarm(alarm.copy(timestamp = alarm.timestamp.plusMinutes(5)))
   }
 }
 
