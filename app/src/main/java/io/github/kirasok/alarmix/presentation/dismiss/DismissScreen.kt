@@ -41,23 +41,25 @@ fun DismissScreen(navController: NavController, viewModel: DismissViewModel = hi
 
   Scaffold {
     Column(modifier = Modifier.padding(it)) {
-      Text(
-        text = viewModel.alarm.value.timestamp.format(
-          DateTimeFormatter.ofLocalizedTime(
-            FormatStyle.SHORT
+      if (viewModel.alarm.value != null) {
+        Text(
+          text = viewModel.alarm.value!!.timestamp.format(
+            DateTimeFormatter.ofLocalizedTime(
+              FormatStyle.SHORT
+            )
           )
         )
-      )
 
-      Row {
-        ElevatedButton(onClick = { viewModel.onEvent(DismissEvent.DismissAlarm) }) {
-          Text(text = "Dismiss")
-        }
+        Row {
+          ElevatedButton(onClick = { viewModel.onEvent(DismissEvent.DismissAlarm) }) {
+            Text(text = "Dismiss")
+          }
 
-        Spacer(modifier = Modifier.width(8.dp))
+          Spacer(modifier = Modifier.width(8.dp))
 
-        ElevatedButton(onClick = { viewModel.onEvent(DismissEvent.SnoozeAlarm) }) {
-          Text(text = "Snooze")
+          ElevatedButton(onClick = { viewModel.onEvent(DismissEvent.SnoozeAlarm) }) {
+            Text(text = "Snooze")
+          }
         }
       }
     }

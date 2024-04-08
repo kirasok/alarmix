@@ -1,7 +1,7 @@
 package io.github.kirasok.alarmix.presentation.dismiss
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,8 +21,8 @@ class DismissViewModel @Inject constructor(
   savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-  private lateinit var _alarm: MutableState<Alarm>
-  val alarm: State<Alarm> = _alarm
+  private val _alarm = mutableStateOf<Alarm?>(null)
+  val alarm: State<Alarm?> = _alarm
 
   private val _eventFlow = MutableSharedFlow<UiEvent>()
   val eventFlow = _eventFlow.asSharedFlow()
@@ -38,12 +38,12 @@ class DismissViewModel @Inject constructor(
 
   fun onEvent(event: DismissEvent) = when (event) {
     DismissEvent.DismissAlarm -> viewModelScope.launch {
-      useCases.cancelAlarm(alarm.value)
+      alarm.value?.let { useCases.cancelAlarm(it) }
       _eventFlow.emit(UiEvent.CloseScreen)
     }
 
     DismissEvent.SnoozeAlarm -> viewModelScope.launch {
-      useCases.snoozeAlarm(alarm.value)
+      alarm.value?.let { useCases.snoozeAlarm(it) }
       _eventFlow.emit(UiEvent.CloseScreen)
     }
   }
