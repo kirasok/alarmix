@@ -3,6 +3,7 @@ package io.github.kirasok.alarmix.presentation
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,6 +37,7 @@ class MainActivity : ComponentActivity() {
       BundleAction.valueOf(it)
     }
     val id = savedInstanceState?.getInt(BUNDLE_ALARM_ID_KEY) ?: -1
+    Log.e(null, "$action,  $id")
 
     setContent {
 
