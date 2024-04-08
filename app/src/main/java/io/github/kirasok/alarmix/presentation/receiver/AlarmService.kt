@@ -29,6 +29,9 @@ import io.github.kirasok.alarmix.domain.model.Alarm
 import io.github.kirasok.alarmix.domain.model.InvalidAlarmError
 import io.github.kirasok.alarmix.domain.model.InvalidAlarmException
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
+import io.github.kirasok.alarmix.presentation.BUNDLE_ACTION_KEY
+import io.github.kirasok.alarmix.presentation.BUNDLE_ALARM_ID_KEY
+import io.github.kirasok.alarmix.presentation.BundleAction
 import io.github.kirasok.alarmix.presentation.MainActivity
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -161,6 +164,8 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
         addFlags(
           Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
         )
+        putExtra(BUNDLE_ACTION_KEY, BundleAction.OPEN_DISMISS_SCREEN.toString())
+        putExtra(BUNDLE_ALARM_ID_KEY, alarm.id)
       }, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 

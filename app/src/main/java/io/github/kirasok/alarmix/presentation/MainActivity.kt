@@ -20,6 +20,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import dagger.hilt.android.AndroidEntryPoint
 import io.github.kirasok.alarmix.R
 import io.github.kirasok.alarmix.presentation.alarms.AlarmsScreen
+import io.github.kirasok.alarmix.presentation.dismiss.DismissScreen
 import io.github.kirasok.alarmix.presentation.editor.EditorScreen
 import io.github.kirasok.alarmix.presentation.permissions.PermissionScreen
 import io.github.kirasok.alarmix.presentation.util.Screen
@@ -30,6 +31,12 @@ class MainActivity : ComponentActivity() {
   @OptIn(ExperimentalPermissionsApi::class)
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    val action = intent.getStringExtra(BUNDLE_ACTION_KEY)?.let {
+      BundleAction.valueOf(it)
+    }
+    val id = intent.getIntExtra(BUNDLE_ALARM_ID_KEY, -1)
+
     setContent {
 
       val permissionList = mutableListOf<String>()
@@ -46,6 +53,12 @@ class MainActivity : ComponentActivity() {
       }
       val multiplePermissionsState = rememberMultiplePermissionsState(permissions = permissionList)
 
+      val startDestination = when (action) {
+        BundleAction.OPEN_EDITOR -> Screen.EditorScreen.route
+        BundleAction.OPEN_DISMISS_SCREEN -> Screen.DismissScreen.route
+        null -> if (multiplePermissionsState.allPermissionsGranted) Screen.EditorScreen.route else Screen.PermissionsScreen.route // TODO: open alarms list
+      }
+
       AlarmixTheme(darkTheme = true) {
         // A surface container using the 'background' color from the theme
         Surface(
@@ -55,7 +68,7 @@ class MainActivity : ComponentActivity() {
           val navController = rememberNavController()
           NavHost(
             navController = navController,
-            startDestination = if (multiplePermissionsState.allPermissionsGranted) Screen.EditorScreen.route else Screen.PermissionsScreen.route
+            startDestination = startDestination
           ) {
             composable(route = Screen.AlarmsScreen.route) {
               AlarmsScreen(navController = navController)
@@ -66,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 name = "alarmId",
               ) {
                 type = NavType.IntType
-                defaultValue = -1
+                defaultValue = id
               }),
             ) {
               EditorScreen(navController = navController)
@@ -80,9 +93,25 @@ class MainActivity : ComponentActivity() {
                 rationale = rationale
               )
             }
+            composable(
+              route = Screen.DismissScreen.route + "?alarmId={alarmId}",
+              arguments = listOf(navArgument("alarmId") {
+                type = NavType.IntType
+                defaultValue = id
+              })
+            ) {
+              DismissScreen(navController = navController)
+            }
           }
         }
       }
     }
   }
+}
+
+const val BUNDLE_ACTION_KEY = "io.github.kirasok.bundle_action_key"
+const val BUNDLE_ALARM_ID_KEY = "io.github.kirasok.bundle_alarm_id_key"
+
+enum class BundleAction {
+  OPEN_EDITOR, OPEN_DISMISS_SCREEN
 }
