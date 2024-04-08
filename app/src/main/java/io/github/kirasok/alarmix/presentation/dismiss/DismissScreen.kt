@@ -1,6 +1,7 @@
 package io.github.kirasok.alarmix.presentation.dismiss
 
 import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import io.github.kirasok.alarmix.presentation.receiver.AlarmService
 import kotlinx.coroutines.flow.collectLatest
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -41,7 +43,11 @@ fun DismissScreen(navController: NavController, viewModel: DismissViewModel = hi
     }
   }
 
-  if (finishAlarm.value) (LocalContext.current as Activity?)?.finish()
+  if (finishAlarm.value) {
+    val context = LocalContext.current
+    context.stopService(Intent(context, AlarmService::class.java))
+    (context as Activity?)?.finish()
+  }
 
   Scaffold {
     Column(
