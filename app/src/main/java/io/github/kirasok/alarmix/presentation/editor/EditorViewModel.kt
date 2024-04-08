@@ -52,7 +52,7 @@ class EditorViewModel @Inject constructor(
     when (event) {
       is EditorEvent.SetAlarm -> viewModelScope.launch {
         try {
-          useCases.insertAlarm(
+          useCases.scheduleAlarm(
             Alarm(
               timestamp = time.value.run {
                 // If we'll initialize time during construction of view model then we can get an InvalidAlarmException because the time could be past current time even with added hours and minutes

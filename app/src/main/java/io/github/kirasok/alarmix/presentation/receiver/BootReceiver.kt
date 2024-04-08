@@ -25,10 +25,10 @@ class BootReceiver : BroadcastReceiver() {
     alarms.forEach { alarm ->
       runBlocking {
         try {
-          alarmUseCases.insertAlarm(alarm) // insertAlarm validates alarm and throws InvalidAlarmException if alarm is not valid
+          alarmUseCases.scheduleAlarm(alarm) // insertAlarm validates alarm and throws InvalidAlarmException if alarm is not valid
         } catch (e: InvalidAlarmException) {
           when (e.invalidAlarmError) {
-            InvalidAlarmError.PAST_TIMESTAMP -> alarmUseCases.deleteAlarm(alarm) // If alarm has past timestamp then we delete it
+            InvalidAlarmError.PAST_TIMESTAMP -> alarmUseCases.cancelAlarm(alarm) // If alarm has past timestamp then we delete it
             else -> {}
           }
         }
