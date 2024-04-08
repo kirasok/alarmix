@@ -12,7 +12,7 @@ import io.github.kirasok.alarmix.data.source.AlarmDatabase
 import io.github.kirasok.alarmix.domain.repository.AlarmRepository
 import io.github.kirasok.alarmix.domain.repository.AlarmScheduler
 import io.github.kirasok.alarmix.domain.use_case.AlarmUseCases
-import io.github.kirasok.alarmix.domain.use_case.DeleteAlarm
+import io.github.kirasok.alarmix.domain.use_case.CancelAlarm
 import io.github.kirasok.alarmix.domain.use_case.GetAlarmById
 import io.github.kirasok.alarmix.domain.use_case.GetAlarms
 import io.github.kirasok.alarmix.domain.use_case.ScheduleAlarm
@@ -50,6 +50,6 @@ object AppModule {
     GetAlarms(repository),
     GetAlarmById(repository),
     ScheduleAlarm(repository, validator, scheduler),
-    DeleteAlarm(repository, scheduler),
+    CancelAlarm(repository, scheduler),
   )
 }

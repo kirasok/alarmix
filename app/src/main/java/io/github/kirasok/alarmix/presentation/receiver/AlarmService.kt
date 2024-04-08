@@ -49,7 +49,7 @@ class AlarmService : Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnEr
     override fun onReceive(context: Context, intent: Intent) {
       when (intent.getStringExtra(ALARM_ACTION_KEY)?.let { AlarmAction.valueOf(it) }) {
         AlarmAction.DISMISS -> {
-          runBlocking { useCases.deleteAlarm(alarm) }
+          runBlocking { useCases.cancelAlarm(alarm) }
           onDestroy()
         }
 

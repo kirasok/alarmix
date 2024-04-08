@@ -11,7 +11,7 @@ data class AlarmUseCases(
   val getAlarms: GetAlarms,
   val getAlarmById: GetAlarmById,
   val scheduleAlarm: ScheduleAlarm,
-  val deleteAlarm: DeleteAlarm,
+  val cancelAlarm: CancelAlarm,
   // We don't need ValidateAlarm there because it's used in insertAlarm, not in presentation layer
 )
 
@@ -38,7 +38,7 @@ class ScheduleAlarm(
   }
 }
 
-class DeleteAlarm(private val repository: AlarmRepository, private val scheduler: AlarmScheduler) {
+class CancelAlarm(private val repository: AlarmRepository, private val scheduler: AlarmScheduler) {
   suspend operator fun invoke(
     alarm: Alarm,
   ) {
