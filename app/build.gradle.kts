@@ -59,7 +59,7 @@ android {
     compose = true
   }
   composeOptions {
-    kotlinCompilerExtensionVersion = "1.5.10"
+    kotlinCompilerExtensionVersion = "1.5.11"
   }
   packaging {
     resources {
@@ -99,7 +99,7 @@ dependencies {
 
   //Dagger - Hilt
   implementation("com.google.dagger:hilt-android:2.51.1")
-  ksp("com.google.dagger:hilt-android-compiler:2.51.1.1")
+  ksp("com.google.dagger:hilt-android-compiler:2.51.1")
 
   // Room
   implementation("androidx.room:room-runtime:2.6.1")
