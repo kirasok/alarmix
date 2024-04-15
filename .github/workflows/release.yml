@@ -85,8 +85,9 @@ jobs:
           KEYSTORE_ALIAS: ${{ secrets.ORIGINAL_KEYSTORE_ALIAS }}
           KEYSTORE_ALIAS_PASSWORD: ${{ secrets.ORIGINAL_KEYSTORE_FILE_PASSWORD }}
           VERSION_CODE: ${{ needs.version.outputs.version-code }}
+          VERSION: ${{ needs.version.outputs.version }}
         run: |
-          ./gradlew -Pversion=${{needs.version.outputs.version}} :app:assembleRelease
+          ./gradlew assembleRelease
       - name: Archive Build # upload apk to be used in deploy job
         id: upload-apk
         uses: actions/upload-artifact@v4
