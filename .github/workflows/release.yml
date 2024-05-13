@@ -106,7 +106,7 @@ jobs:
         with: # downloads all artifacts that were made in this run
           merge-multiple: true # if there's more than 1 artifact with the same name, it will merge them in one folder
       - name: Create Github Release
-        uses: softprops/action-gh-release@v2.0.4
+        uses: softprops/action-gh-release@v2.0.5
         with:
           tag_name: ${{ needs.version.outputs.version }}
           body: ${{ needs.changelog.outputs.changelog }}
